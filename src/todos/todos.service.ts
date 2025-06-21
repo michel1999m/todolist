@@ -4,14 +4,22 @@ import { Todo } from './schemas/todo.schema';
 import { Model } from 'mongoose';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { NotFoundError } from 'rxjs';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Counter } from 'prom-client';
 
 @Injectable()
 export class TodosService {
-    constructor(@InjectModel(Todo.name) private todoModel: Model<Todo>) {}
+    constructor(@InjectModel(Todo.name) private todoModel: Model<Todo>,
+    @InjectMetric('todos_created_total') private todosCreatedCounter: Counter<string>,
+    @InjectMetric('todos_removed_total') private todosRemovedCounter: Counter<string>,
+
+) {}
     
     async create(createTodoDto: CreateTodoDto): Promise<Todo> {
         const created = new this.todoModel(createTodoDto);
-        return created.save();
+       await created.save();
+        this.todosCreatedCounter.inc(); // increment metric
+        return created;
     }
     async  findAll(): Promise<Todo[]> {
         return this.todoModel.find().exec();
