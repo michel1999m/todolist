@@ -24,6 +24,14 @@ import { makeCounterProvider, PrometheusModule } from '@willsoto/nestjs-promethe
       name: 'todos_removed_total',
       help: 'The number of todos that have been removed',
     }),
+  makeCounterProvider({
+    name: 'todos_fetched_total',
+    help: 'The number of times todos were fetched',
+  }),
+  makeCounterProvider({
+    name: 'mongodb_requests_total',
+    help: 'Total number of requests sent to MongoDB',
+  }),
   ],
   // exports:[TodosService]
 })
